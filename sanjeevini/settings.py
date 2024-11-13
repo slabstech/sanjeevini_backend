@@ -25,8 +25,9 @@ SECRET_KEY = 'django-insecure-3oocb4fhj&d9vwtsgqfz)^nbj#9pt5(k%42apr=m$37=gi8w89
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
+X_FRAME_OPTIONS = 'ALLOW-FROM https://huggingface.co/'
 
 # Application definition
 
@@ -37,6 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'drf_yasg',
+    'csp',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'userapp'
 ]
 
 MIDDLEWARE = [
@@ -47,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'csp.middleware.CSPMiddleware',
 ]
 
 ROOT_URLCONF = 'sanjeevini.urls'
@@ -68,6 +75,25 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'sanjeevini.wsgi.application'
+
+CSP_IMG_SRC = ("'self'", "data:", "https://sanjeevini.me")
+
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")
+CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'")
+CSP_CONNECT_SRC = ("'self'", "https://sanjeevini.me")
+CSP_IMG_SRC = ("'self'", "data:", "https:")
+CSP_FONT_SRC = ("'self'", "https:", "data:")
+
+
+CORS_ORIGIN_WHITELIST = [
+    'https://sanjeevini.me',
+]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000"
+]
+CORS_ALLOW_CREDENTIALS = True
 
 
 # Database
