@@ -42,7 +42,9 @@ INSTALLED_APPS = [
     'csp',
     'rest_framework',
     'rest_framework.authtoken',
-    'userapp'
+    'userapp',
+    'doctorapp',
+    
 ]
 
 MIDDLEWARE = [
