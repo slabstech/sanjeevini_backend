@@ -20,6 +20,6 @@ class UserAppPagination(PageNumberPagination):
     max_page_size = 100
 
 class UserAppViewSet(viewsets.ModelViewSet):
-    queryset = UserApp.objects.all()
+    queryset = UserApp.objects.all().order_by('id')
     serializer_class = UserAppSerializer
     pagination_class = UserAppPagination

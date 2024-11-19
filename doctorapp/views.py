@@ -20,6 +20,6 @@ class DoctorAppPagination(PageNumberPagination):
     max_page_size = 100
 
 class DoctorAppViewSet(viewsets.ModelViewSet):
-    queryset = DoctorApp.objects.all()
+    queryset = DoctorApp.objects.all().order_by('id')
     serializer_class = DoctorAppSerializer
     pagination_class = DoctorAppPagination
