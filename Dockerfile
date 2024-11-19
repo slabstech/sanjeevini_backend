@@ -1,5 +1,5 @@
 # pull official base image
-FROM python:3.10-bullseye
+FROM python:3.12-bullseye
 
 RUN useradd -m -u 1000 user
 USER user
