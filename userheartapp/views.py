@@ -9,17 +9,17 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 import requests
 
-from .models import DoctorApp
-from .serializers import DoctorAppSerializer
+from .models import UserHeartApp
+from .serializers import UserHeartAppSerializer
 
 from rest_framework.pagination import PageNumberPagination
 
-class DoctorAppPagination(PageNumberPagination):
+class UserHeartAppPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
     max_page_size = 100
 
-class DoctorAppViewSet(viewsets.ModelViewSet):
-    queryset = DoctorApp.objects.all().order_by('id')
-    serializer_class = DoctorAppSerializer
-    pagination_class = DoctorAppPagination
+class UserHeartAppViewSet(viewsets.ModelViewSet):
+    queryset = UserHeartApp.objects.all().order_by('id')
+    serializer_class = UserHeartAppSerializer
+    pagination_class = UserHeartAppPagination

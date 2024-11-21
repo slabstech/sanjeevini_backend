@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from .models import DoctorApp
+from .models import UserWeightApp
 
-class DoctorAppSerializer(serializers.ModelSerializer):
+class UserWeightAppSerializer(serializers.ModelSerializer):
     class Meta:
-        model = DoctorApp
+        model = UserWeightApp
         fields = '__all__'

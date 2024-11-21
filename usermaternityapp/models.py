@@ -1,6 +1,6 @@
 from django.db import models
 
-class DoctorApp(models.Model):
+class UserMaternityApp(models.Model):
     id = models.BigAutoField(primary_key=True)
     appointment_day = models.DateField()
     appointment_time = models.TimeField()

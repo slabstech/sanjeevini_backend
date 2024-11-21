@@ -9,17 +9,17 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 import requests
 
-from .models import DoctorApp
-from .serializers import DoctorAppSerializer
+from .models import UserMaternityApp
+from .serializers import UserMaternityAppSerializer
 
 from rest_framework.pagination import PageNumberPagination
 
-class DoctorAppPagination(PageNumberPagination):
+class UserMaternityAppPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
     max_page_size = 100
 
-class DoctorAppViewSet(viewsets.ModelViewSet):
-    queryset = DoctorApp.objects.all().order_by('id')
-    serializer_class = DoctorAppSerializer
-    pagination_class = DoctorAppPagination
+class UserMaternityAppViewSet(viewsets.ModelViewSet):
+    queryset = UserMaternityApp.objects.all().order_by('id')
+    serializer_class = UserMaternityAppSerializer
+    pagination_class = UserMaternityAppPagination
