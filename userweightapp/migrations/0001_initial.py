@@ -20,6 +20,7 @@ class Migration(migrations.Migration):
                 ('patient_name', models.CharField(max_length=255)),
                 ('status', models.CharField(max_length=255)),
                 ('observations', models.TextField()),
+                ('weight', models.FloatField()),
             ],
         ),
     ]

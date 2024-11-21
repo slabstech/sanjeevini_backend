@@ -7,3 +7,4 @@ class UserWeightApp(models.Model):
     patient_name = models.CharField(max_length=255)
     status = models.CharField(max_length=255)
     observations = models.TextField()
+    weight = models.FloatField() # new field to store weight data

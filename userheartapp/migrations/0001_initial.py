@@ -2,7 +2,6 @@
 
 from django.db import migrations, models
 
-
 class Migration(migrations.Migration):
 
     initial = True
@@ -20,6 +19,10 @@ class Migration(migrations.Migration):
                 ('patient_name', models.CharField(max_length=255)),
                 ('status', models.CharField(max_length=255)),
                 ('observations', models.TextField()),
+                ('heart_rate', models.IntegerField()),
+                ('blood_pressure_systolic', models.IntegerField()),
+                ('blood_pressure_diastolic', models.IntegerField()),
+                ('oxygen_saturation', models.DecimalField(max_digits=4, decimal_places=2)),
             ],
         ),
     ]

@@ -2,8 +2,14 @@ from django.db import models
 
 class UserDiabetesApp(models.Model):
     id = models.BigAutoField(primary_key=True)
-    appointment_day = models.DateField()
-    appointment_time = models.TimeField()
     patient_name = models.CharField(max_length=255)
-    status = models.CharField(max_length=255)
-    observations = models.TextField()
+    blood_glucose_level = models.DecimalField(max_digits=5, decimal_places=2)
+    measurement_date = models.DateField()
+    measurement_time = models.TimeField()
+    meal_type = models.CharField(max_length=255)
+    medication_dose = models.DecimalField(max_digits=5, decimal_places=2)
+    medication_name = models.CharField(max_length=255)
+    medication_time = models.TimeField()
+    physical_activity = models.CharField(max_length=255)
+    duration = models.IntegerField()
+    notes = models.TextField()

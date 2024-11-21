@@ -2,7 +2,6 @@
 
 from django.db import migrations, models
 
-
 class Migration(migrations.Migration):
 
     initial = True
@@ -20,6 +19,7 @@ class Migration(migrations.Migration):
                 ('patient_name', models.CharField(max_length=255)),
                 ('status', models.CharField(max_length=255)),
                 ('observations', models.TextField()),
+                ('pregnancy_week', models.IntegerField()),
             ],
         ),
     ]
