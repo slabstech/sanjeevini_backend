@@ -44,7 +44,13 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'userapp',
     'doctorapp',
-    
+    'doctorappointmentapp',
+    'prescriptionapp',
+    'userappointmentapp',
+    'userdiabetesapp',
+    'userheartapp',
+    'usermaternityapp',
+    'userweightapp',
 ]
 
 MIDDLEWARE = [
