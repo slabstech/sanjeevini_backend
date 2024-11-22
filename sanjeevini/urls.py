@@ -25,4 +25,11 @@ urlpatterns = [
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('api/v1/userapp/', include('userapp.urls')),
     path('api/v1/doctorapp/', include('doctorapp.urls')),
+    path('api/v1/doctorappointmentapp/', include('doctorappointmentapp.urls')),
+    path('api/v1/prescriptionapp/', include('prescriptionapp.urls')),
+    path('api/v1/userappointmentapp/', include('userappointmentapp.urls')),
+    path('api/v1/userdiabetesapp/', include('userdiabetesapp.urls')),
+    path('api/v1/userheartapp/', include('userheartapp.urls')),
+    path('api/v1/usermaternityapp/', include('usermaternityapp.urls')),
+    path('api/v1/userweightapp/', include('userweightapp.urls')),
 ]
