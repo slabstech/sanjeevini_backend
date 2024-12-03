@@ -43,9 +43,7 @@ class SpeechASRView(APIView):
             data = request.data
             ##prompt =  data['prompt']
             audio = data['audio']
-            print('hre1')
             client = OpenAI(api_key="cant-be-empty", base_url="http://0.0.0.0:11800/v1/")
-            print('her2')
             #filename= '/home/gaganyatri/Music/test1.flac'
             audio_bytes = audio.read()
 
@@ -156,7 +154,7 @@ class SpeechLLMView(APIView):
             voice_content = transcript.text
                         #content = 'audio recieved'
 
-            model = "mistral-nemo:latest"
+            model = "llama3.2:latest"
             client = Client(host='http://localhost:11434')
             response = client.chat(
             model=model,
