@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'csp',
     'rest_framework',
     'rest_framework.authtoken',
+    'inference',
     'userapp',
     'doctorapp',
     'doctorappointmentapp',
@@ -62,6 +63,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'csp.middleware.CSPMiddleware',
+    'sanjeevini.middleware.XFrameOptionsMiddleware',
 ]
 
 ROOT_URLCONF = 'sanjeevini.urls'
