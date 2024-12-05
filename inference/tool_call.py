@@ -3,12 +3,12 @@ from typing import List
 from mistral_common.tokens.tokenizers.mistral import MistralTokenizer
 from mistral_common.protocol.instruct.request import ChatCompletionRequest
 from mistral_common.protocol.instruct.tool_calls import Function, Tool
-import ollama
 from mistral_common.protocol.instruct.messages import UserMessage
 import json
 import requests
 import functools
 import os
+from ollama import Client
 
 
 def getPetById(petId: int) -> str:
@@ -113,8 +113,10 @@ def get_user_messages(queries: List[str]) -> List[UserMessage]:
 
 
 def execute_generator():
-    queries = ["What's the status of my Pet 1?", "Find information of user user1?" ,  "What's the status of my Store Order 3?"]
-    return_objs = [['pet','petId'], ['user', 'username'], ['store/order','orderId']]
+    #queries = ["What's the status of my Pet 1?", "Find information of user user1?" ,  "What's the status of my Store Order 3?"]
+    #return_objs = [['pet','petId'], ['user', 'username'], ['store/order','orderId']]
+    queries = ["What's the status of my Pet 1?"]
+    return_objs = [['pet','petId']]
     function_end_point =  'https://petstore3.swagger.io/api/v3/openapi.json'
     user_messages=get_user_messages(queries)
     user_tools = generate_tools(return_objs, function_end_point)
@@ -126,25 +128,21 @@ def execute_generator():
     _, text = tokenized.tokens, tokenized.text
 
     ollama_endpoint_env = 'http://localhost:11434'
-    #ollama_endpoint_env = os.environ.get('OLLAMA_ENDPOINT')
-    model = "mistral:7b"
-    prompt = text 
+ 
+    model = 'mistral'
 
-    #if ollama_endpoint_env is None:
-    #    ollama_endpoint_env = 'http://localhost:11434'
-    ollama_endpoint = ollama_endpoint_env +  "/api/generate"  # replace with localhost
+    client = Client(host=ollama_endpoint_env)
+    response = client.generate(
+    model=model,
+    stream= False,
+    raw=True,
+    prompt=text,
+    )
 
-    response = requests.post(ollama_endpoint,
-                      json={
-                          'model': model,
-                          'prompt': prompt,
-                          'stream':False,
-                          'raw': True
-                      }, stream=False
-                      )
-    
-    response.raise_for_status()
-    result = response.json()
+    #print(response)    
+    #response.raise_for_status()
+    result = response.model_dump_json()
+    print(result)
 
     process_results(result, user_messages)
 
@@ -180,9 +178,9 @@ def get_objects_parameters(url):
 
 def tool_call_function():
 
-    ollama_url = "http://localhost:11434"
-    model_name = "mistral"
-    load_model( ollama_url, model_name )
+    #ollama_url = "http://localhost:11434"
+    #model_name = "mistral"
+    #load_model( ollama_url, model_name )
 
     return_objs = [['pet','petId'], ['user', 'username'], ['store/order','orderId']]
     function_end_point =  'https://petstore3.swagger.io/api/v3/openapi.json'
@@ -192,5 +190,5 @@ def tool_call_function():
     print(user_tools)
 
 
-tool_call_function()
+#tool_call_function()
 execute_generator()
