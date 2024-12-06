@@ -127,25 +127,38 @@ def execute_generator():
     tokenized = tokenizer.encode_chat_completion(completion_request)
     _, text = tokenized.tokens, tokenized.text
 
-    ollama_endpoint_env = 'http://localhost:11434'
- 
-    model = 'mistral'
+    model = "mistral:7b"
+    prompt = text 
+    #print(prompt)
+    #if ollama_endpoint_env is None:
+    #    ollama_endpoint_env = 'http://localhost:11434'
+    url = "http://localhost:11434/api/generate"
+    headers = {
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "model": "mistral",
+        "prompt": prompt,
+        "stream": False,
+        "raw": True,
 
-    client = Client(host=ollama_endpoint_env)
-    response = client.generate(
-    model=model,
-    stream= False,
-    raw=True,
-    prompt=text,
-    )
+    }
 
-    #print(response)    
-    #response.raise_for_status()
-    result = response.model_dump_json()
+    result = ''
+    try:
+        response = requests.post(url, headers=headers, data=json.dumps(payload))
+        response.raise_for_status()  # Raise an HTTPError for bad responses (4xx and 5xx)
+        result = response.json()
+    except requests.exceptions.HTTPError as http_err:
+        print(f"HTTP error occurred: {http_err}")
+    except Exception as err:
+        print(f"Other error occurred: {err}")
+
     print(result)
-
+    #result = response.json
     process_results(result, user_messages)
 
+ 
 def process_results(result, messages):
 
     result_format = result['response'].split("\n\n")
