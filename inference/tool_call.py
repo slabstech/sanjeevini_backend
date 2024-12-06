@@ -16,7 +16,7 @@ def getPetById(petId: int) -> str:
         method = 'GET'
         headers=None
         data=None
-        url =  'https://petstore3.swagger.io/api/v3/pet/' + str(petId)
+        url =  'http://localhost:8000/api/v1/doctorapp/' + str(petId)
         response = requests.request(method, url, headers=headers, data=data)
         # Raise an exception if the response was unsuccessful
         response.raise_for_status()
@@ -80,11 +80,14 @@ def generate_tools(objs, function_end_point)-> List[Tool]:
     params = ['operationId', 'description',  'parameters']
     parser = prance.ResolvingParser(function_end_point, backend='openapi-spec-validator')
     spec = parser.specification
-    
+    print(spec)
     user_tools = []
     for obj in objs:
         resource, field = obj
         path = '/' + resource + '/{' + field + '}'
+        print(path)
+        function_name=spec['paths'][path]
+        print(function_name)
         function_name=spec['paths'][path]['get'][params[0]]
         function_description=spec['paths'][path]['get'][params[1]]
         function_parameters=spec['paths'][path]['get'][params[2]]
@@ -116,8 +119,8 @@ def execute_generator():
     #queries = ["What's the status of my Pet 1?", "Find information of user user1?" ,  "What's the status of my Store Order 3?"]
     #return_objs = [['pet','petId'], ['user', 'username'], ['store/order','orderId']]
     queries = ["What's the status of my Pet 1?"]
-    return_objs = [['pet','petId']]
-    function_end_point =  'https://petstore3.swagger.io/api/v3/openapi.json'
+    return_objs = [['doctorapp','id']]
+    function_end_point =  'http://localhost:8000/api/schema/swagger-ui/?format=openapi'
     user_messages=get_user_messages(queries)
     user_tools = generate_tools(return_objs, function_end_point)
 
@@ -187,20 +190,6 @@ def get_objects_parameters(url):
         print(key)
         properties = spec['components']['schemas'][key]
         print(properties)
-
-
-def tool_call_function():
-
-    #ollama_url = "http://localhost:11434"
-    #model_name = "mistral"
-    #load_model( ollama_url, model_name )
-
-    return_objs = [['pet','petId'], ['user', 'username'], ['store/order','orderId']]
-    function_end_point =  'https://petstore3.swagger.io/api/v3/openapi.json'
-
-    # return_objs = get_objects_parameters(function_end_point)
-    user_tools = generate_tools(return_objs, function_end_point)
-    print(user_tools)
 
 
 #tool_call_function()
