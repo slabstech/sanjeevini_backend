@@ -1,21 +1,15 @@
-from django.shortcuts import render
-from django.core.files.storage import FileSystemStorage
-import django_filters
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.pagination import LimitOffsetPagination
-from django.utils import timezone
-from datetime import datetime, timedelta
-import requests
+from rest_framework.pagination import PageNumberPagination
+from django_filters.rest_framework import DjangoFilterBackend
 
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+from drf_spectacular.utils import extend_schema, extend_schema_serializer
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.openapi import OpenApiParameter
 
 from .models import DoctorApp
 from .serializers import DoctorAppSerializer
-
-from rest_framework.pagination import PageNumberPagination
 
 class DoctorAppPagination(PageNumberPagination):
     page_size = 10
@@ -27,45 +21,41 @@ class DoctorAppViewSet(viewsets.ModelViewSet):
     serializer_class = DoctorAppSerializer
     pagination_class = DoctorAppPagination
 
-    @swagger_auto_schema(
-        operation_summary="List all doctor appointments",
-        operation_description="This endpoint retrieves a list of all doctor appointments. "
-                              "You can filter the results by the doctor's name and paginate through the results.",
-        operation_id="listDoctorAppointments",
-        tags=["DoctorApp"],
+    @extend_schema(
+        summary="List all doctor appointments",
+        description="This endpoint retrieves a list of all doctor appointments. "
+                    "You can filter the results by the doctor's name and paginate through the results.",
         responses={200: DoctorAppSerializer(many=True)},
-        manual_parameters=[
-            openapi.Parameter(
+        parameters=[
+            OpenApiParameter(
                 name='name',
-                in_=openapi.IN_QUERY,
-                type=openapi.TYPE_STRING,
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
                 description="Filter by doctor's name",
                 required=False
             ),
-            openapi.Parameter(
+            OpenApiParameter(
                 name='page',
-                in_=openapi.IN_QUERY,
-                type=openapi.TYPE_INTEGER,
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
                 description="Page number",
                 required=False
             ),
-            openapi.Parameter(
+            OpenApiParameter(
                 name='page_size',
-                in_=openapi.IN_QUERY,
-                type=openapi.TYPE_INTEGER,
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
                 description="Number of items per page",
                 required=False
             ),
-        ]
+        ],
     )
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
-    @swagger_auto_schema(
-        operation_summary="Retrieve a single doctor appointment",
-        operation_description="This endpoint retrieves a single doctor appointment by its ID.",
-        operation_id="retrieveDoctorAppointment",
-        tags=["DoctorApp"],
+    @extend_schema(
+        summary="Retrieve a single doctor appointment",
+        description="This endpoint retrieves a single doctor appointment by its ID.",
         responses={200: DoctorAppSerializer},
     )
     def retrieve(self, request, *args, **kwargs):
