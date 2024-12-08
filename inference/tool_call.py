@@ -102,7 +102,10 @@ def generate_tools_prompt(objs, function_end_point):
 
     # Split the user message into smaller parts
     user_message_part1 = f"""
-    Parse this OpenAPI spec {spec} and return values of {objs} for function parameters. Only return values in JSON for which the spec is complete. Do not return values for empty specs. Do not explain, do not hallucinate.
+    Parse this OpenAPI spec {spec} and return values of {objs} for function parameters. 
+    Only return values in JSON for which the spec is complete. 
+    Do not return values for empty specs. Do not explain, do not hallucinate. 
+    Just return json, without any explanation.
     """
 
     user_message_part2 = """
@@ -122,17 +125,7 @@ def generate_tools_prompt(objs, function_end_point):
             "required": ["city"],
             },
         }
-    """
-
-    user_message_part3 = """
-                            "format": {
-                                "type": "string",
-                                "enum": ["celsius", "fahrenheit"],
-                                "description": "The temperature unit to use. Infer this from the users location.",
-                            },
-                        },
-                        "required": ["location", "format"],
-                    },
+    }
     """
 
     # Combine the parts
@@ -224,13 +217,24 @@ def execute_generator():
     #result = response.json
     process_results(result, user_messages)
 
+
+class Function:
+    def __init__(self, name, arguments):
+        self.name = name
+        self.arguments = arguments
+
+class ToolCall:
+    def __init__(self, function):
+        self.function = function
  
-def process_results(result, messages):
+def process_results(result, messages=None):
 
-    result_format = result['response'].split("\n\n")
-    result_tool_calls = result_format[0].replace("[TOOL_CALLS] ","")
+    #result_format = result['response'].split("\n\n")
+    #result_tool_calls = result_format[0].replace("[TOOL_CALLS] ","")
 
-    tool_calls = json.loads(result_tool_calls)
+    #tool_calls = json.loads(result)
+    tool_calls = result
+    
     index = 0 
     try:
         for tool_call in tool_calls:
@@ -238,7 +242,7 @@ def process_results(result, messages):
             function_params = (tool_call["arguments"]) 
             #print(messages[index].content)
             function_result = names_to_functions[function_name](**function_params)
-            #print(function_result)
+            print(function_result)
             index = index + 1
     except:
         print(function_name + " is not defined")
@@ -257,9 +261,9 @@ def get_objects_parameters(url):
 
 #tool_call_function()
 #execute_generator()
-return_objs = [['doctorapp','id']]
-function_end_point =  'http://localhost:8000/api/schema/?format=json'
-user_tools = generate_tools_prompt(return_objs, function_end_point)
+#return_objs = [['doctorapp','id']]
+#function_end_point =  'http://localhost:8000/api/schema/?format=json'
+#user_tools = generate_tools_prompt(return_objs, function_end_point)
 #print(user_tools)
 
 def ollama_tools():
@@ -304,6 +308,50 @@ def ollama_tools_prompt(tools_json):
     )
 
     print(response['message']['tool_calls'])
+    tool_calls_result = response['message']['tool_calls']
+    return tool_calls_result
 
+user_tools_str = """
+{
+  "type": "function",
+  "function": {
+    "name": "get_doctorapp",
+    "description": "Get a doctor appointment by id",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        }
+      },
+      "required": ["id"]
+    }
+  }
+}
+"""
+user_tools_json = json.loads(user_tools_str)
+#print(user_tools_json)
+tool_calls = ollama_tools_prompt(user_tools_json)
+#process_results(tool_call_results)
 
-#ollama_tools_prompt(user_tools)
+def process_tool_calls(tool_calls, names_to_functions):
+    index = 0
+    try:
+        for tool_call in tool_calls:
+            function_name = tool_call.function.name
+            function_params = tool_call.function.arguments
+            # Print message content if needed
+            # print(messages[index].content)
+            function_result = names_to_functions[function_name](**function_params)
+            print(function_result)
+            index += 1
+    except KeyError:
+        print(f"{function_name} is not defined")
+
+# Example usage
+#tool_calls = [ToolCall(function=Function(name='get_doctorapp', arguments={'id': 1}))]
+names_to_functions = {
+    'get_doctorapp': lambda id: f"Doctor appointment details for ID {id}"
+}
+
+process_tool_calls(tool_calls, names_to_functions)
