@@ -9,6 +9,7 @@ import requests
 import functools
 import os
 from ollama import Client
+import ollama
 
 
 def getPetById(petId: int) -> str:
@@ -76,36 +77,6 @@ def load_model(ollama_url, model_name):
         print(f"Request failed with status code: {response.status_code}")
         ##print(response.text)
 
-def generate_tools(objs, function_end_point)-> List[Tool]:
-    params = ['operationId', 'description',  'parameters']
-    parser = prance.ResolvingParser(function_end_point, backend='openapi-spec-validator')
-    spec = parser.specification
-    #print(spec)
-    user_tools = []
-    for obj in objs:
-        resource, field = obj
-        path = '/' + resource + '/{' + field + '}'
-        print(path)
-        function_name=spec['paths'][path]
-        print(function_name)
-        function_name=spec['paths'][path]['get'][params[0]]
-        function_description=spec['paths'][path]['get'][params[1]]
-        function_parameters=spec['paths'][path]['get'][params[2]]
-        func_parameters = {
-        "type": "object",
-        "properties": {
-            function_parameters[0]['name']: {
-                "type": function_parameters[0]['schema']['type'],
-                "description": function_parameters[0]['description']
-            }
-        },
-        "required": [function_parameters[0]['name']]
-    }
-        user_function= Function(name = function_name, description = function_description, parameters = func_parameters, )
-        user_tool = Tool(function = user_function)
-        user_tools.append(user_tool)
-    return user_tools
-
 
 def get_user_messages(queries: List[str]) -> List[UserMessage]:
     user_messages=[]
@@ -114,7 +85,7 @@ def get_user_messages(queries: List[str]) -> List[UserMessage]:
         user_messages.append(user_message)
     return user_messages
 
-def generate_tools_prompt(objs, function_end_point)-> List[Tool]:
+def generate_tools_prompt(objs, function_end_point):
     params = ['operationId', 'description',  'parameters']
     parser = prance.ResolvingParser(function_end_point, backend='openapi-spec-validator')
     spec = parser.specification
@@ -131,20 +102,26 @@ def generate_tools_prompt(objs, function_end_point)-> List[Tool]:
 
     # Split the user message into smaller parts
     user_message_part1 = f"""
-    Parse this OpenAPI spec {spec} and return values for function parameters. To get the doctor ID, check for /api/v1/doctorapp. Only return values in JSON for which the spec is complete. Do not return values for empty specs. Do not explain, do not hallucinate.
+    Parse this OpenAPI spec {spec} and return values of {objs} for function parameters. Only return values in JSON for which the spec is complete. Do not return values for empty specs. Do not explain, do not hallucinate.
     """
 
     user_message_part2 = """
-    Example - function=Function(
-                        name="get_current_weather",
-                    description="Get the current weather",
-                    parameters={
-                        "type": "object",
-                        "properties": {
-                        "location": {
-                                "type": "string",
-                                "description": "The city and state, e.g. San Francisco, CA",
-                            },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_current_weather",
+            "description": "Get the current weather for a city",
+            "parameters": {
+            "type": "object",
+            "properties": {
+                "city": {
+                "type": "string",
+                "description": "The name of the city",
+                },
+            },
+            "required": ["city"],
+            },
+        }
     """
 
     user_message_part3 = """
@@ -159,7 +136,7 @@ def generate_tools_prompt(objs, function_end_point)-> List[Tool]:
     """
 
     # Combine the parts
-    user_message = user_message_part1 + user_message_part2 + user_message_part3
+    user_message = user_message_part1 + user_message_part2 
 
 # Combine and send the messages
 
@@ -168,9 +145,13 @@ def generate_tools_prompt(objs, function_end_point)-> List[Tool]:
     
     model='mistral'
     result = execute_prompts(prompt=combined_prompt, model=model)
-    print(result['response'])
-    user_tools = []
-    return user_tools
+    #print(result['response'])
+    function_value = result['response']
+    print(function_value)
+
+    tool_json_value = json.loads(function_value) 
+    print(tool_json_value)
+    return tool_json_value
     
 
 
@@ -279,4 +260,50 @@ def get_objects_parameters(url):
 return_objs = [['doctorapp','id']]
 function_end_point =  'http://localhost:8000/api/schema/?format=json'
 user_tools = generate_tools_prompt(return_objs, function_end_point)
-print(user_tools)
+#print(user_tools)
+
+def ollama_tools():
+    response = ollama.chat(
+        model='mistral',
+        messages=[{'role': 'user', 'content':
+            'What is the weather in Toronto?'}],
+
+            # provide a weather checking tool to the model
+        tools=[{
+        'type': 'function',
+        'function': {
+            'name': 'get_current_weather',
+            'description': 'Get the current weather for a city',
+            'parameters': {
+            'type': 'object',
+            'properties': {
+                'city': {
+                'type': 'string',
+                'description': 'The name of the city',
+                },
+            },
+            'required': ['city'],
+            },
+        },
+        },
+    ],
+    )
+
+    print(response['message']['tool_calls'])
+
+
+
+def ollama_tools_prompt(tools_json):
+    response = ollama.chat(
+        model='mistral',
+        messages=[{'role': 'user', 'content':
+            'What is the status of User 1?'}],
+
+            # provide a weather checking tool to the model
+        tools=[tools_json],
+    )
+
+    print(response['message']['tool_calls'])
+
+
+#ollama_tools_prompt(user_tools)
