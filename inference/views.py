@@ -8,13 +8,45 @@ from openai import OpenAI
 from ollama import Client
 from django.http import FileResponse
 import io
+from rest_framework.generics import GenericAPIView
 
-class TTSView(APIView):
+
+from rest_framework import serializers
+
+class TextLLMSerializer(serializers.Serializer):
+    isOnline = serializers.BooleanField()
+    model = serializers.CharField(max_length=100)
+    messages = serializers.ListField(
+        child=serializers.DictField(
+            child=serializers.CharField(max_length=100)
+        )
+    )
+
+class SpeechASRSerializer(serializers.Serializer):
+    audio = serializers.FileField()
+    prompt = serializers.CharField(required=False)
+
+class SpeechLLMSerializer(serializers.Serializer):
+    audio = serializers.FileField()
+    prompt = serializers.CharField(required=False)
+
+class SpeechToSpeechSerializer(serializers.Serializer):
+    audio = serializers.FileField()
+    prompt = serializers.CharField(required=False)
+
+class TTSSerializer(serializers.Serializer):
+    tts_text = serializers.CharField(max_length=1000)
+
+class TTSView(GenericAPIView):
+    serializer_class = TTSSerializer
     def post(self, request, format=None):
         # Define the API endpoint
         # Define the URL for the TTS API
         url = 'http://localhost:5002/api/tts'
 
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        text = serializer.validated_data['tts_text']
         # Define the multiline text
         text = "This is the first line"
 
@@ -37,12 +69,15 @@ class TTSView(APIView):
         else:
             return Response({"error": "Failed to synthesize speech"}, status=response.status_code)
 
-class SpeechASRView(APIView):
+class SpeechASRView(GenericAPIView):
+    serializer_class = SpeechASRSerializer
+
     def post(self, request, format=None):
         try: 
-            data = request.data
-            ##prompt =  data['prompt']
-            audio = data['audio']
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+
+            audio = serializer.validated_data['audio']
             client = OpenAI(api_key="cant-be-empty", base_url="http://0.0.0.0:11800/v1/")
             #filename= '/home/gaganyatri/Music/test1.flac'
             audio_bytes = audio.read()
@@ -61,12 +96,15 @@ class SpeechASRView(APIView):
             return Response({'error': 'Something went wrong'}, status=500)
 
 
-class SpeechToSpeechView(APIView):
+class SpeechToSpeechView(GenericAPIView):
+    serializer_class = SpeechToSpeechSerializer
+
     def post(self, request, format=None):
         try: 
-            data = request.data
-            ##prompt =  data['prompt']
-            audio = data['audio']
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+
+            audio = serializer.validated_data['audio']
 
             client = OpenAI(api_key="cant-be-empty", base_url="http://0.0.0.0:11800/v1/")
 
@@ -132,12 +170,15 @@ class SpeechToSpeechView(APIView):
             print(f"An error occurred: {e}")
             return Response({'error': 'Something went wrong'}, status=500)
 
-class SpeechLLMView(APIView):
+class SpeechLLMView(GenericAPIView):
+    serializer_class = SpeechLLMSerializer
+
     def post(self, request, format=None):
         try: 
-            data = request.data
-            ##prompt =  data['prompt']
-            audio = data['audio']
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+
+            audio = serializer.validated_data['audio']
 
             client = OpenAI(api_key="cant-be-empty", base_url="http://localhost:11800/v1/")
 
@@ -172,12 +213,15 @@ class SpeechLLMView(APIView):
             print(f"An error occurred: {e}")
             return Response({'error': 'Something went wrong'}, status=500)
 
-class TextLLMView(APIView):
+class TextLLMView(GenericAPIView):
+    serializer_class = TextLLMSerializer
     def post(self, request, format=None):
         try:
-            data = request.data
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
 
-            isOnline = data['isOnline']
+            data = serializer.validated_data
+            isOnline = True
 
             prompt =  data['messages'][0]['prompt']
             # Specify model
