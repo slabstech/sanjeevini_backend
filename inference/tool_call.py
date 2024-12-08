@@ -119,30 +119,56 @@ def generate_tools_prompt(objs, function_end_point)-> List[Tool]:
     parser = prance.ResolvingParser(function_end_point, backend='openapi-spec-validator')
     spec = parser.specification
     #print(spec)
+
+    system_message = """
+        You are a helpful assistant that parses OpenAPI specifications. Here are the key instructions:
+        1. Parse the provided OpenAPI specification.
+        2. Return values for function parameters only when the specification is complete.
+        3. Do not return values for empty specifications.
+        4. Do not explain or provide additional details.
+        5. Do not hallucinate or add extra information.
+    """
+
+    # Split the user message into smaller parts
+    user_message_part1 = f"""
+    Parse this OpenAPI spec {spec} and return values for function parameters. To get the doctor ID, check for /api/v1/doctorapp. Only return values in JSON for which the spec is complete. Do not return values for empty specs. Do not explain, do not hallucinate.
+    """
+
+    user_message_part2 = """
+    Example - function=Function(
+                        name="get_current_weather",
+                    description="Get the current weather",
+                    parameters={
+                        "type": "object",
+                        "properties": {
+                        "location": {
+                                "type": "string",
+                                "description": "The city and state, e.g. San Francisco, CA",
+                            },
+    """
+
+    user_message_part3 = """
+                            "format": {
+                                "type": "string",
+                                "enum": ["celsius", "fahrenheit"],
+                                "description": "The temperature unit to use. Infer this from the users location.",
+                            },
+                        },
+                        "required": ["location", "format"],
+                    },
+    """
+
+    # Combine the parts
+    user_message = user_message_part1 + user_message_part2 + user_message_part3
+
+# Combine and send the messages
+
+    # Combine and send the messages
+    combined_prompt = f"{system_message}\n\n{user_message}"
     
-    prompt = ('parse this openapi spec {spec} and return values for function parameter. Only return values for which is complete spec. Do not return for empty spec.'
-    'Example - function=Function( '
-    '                    name="get_current_weather", '
-    '                description="Get the current weather",'
-    '                parameters={'
-    '                    "type": "object",'
-    '                    "properties": { '
-    '                       "location": { '
-    '                            "type": "string",'
-    '                            "description": "The city and state, e.g. San Francisco, CA",'
-    '                        },'
-    '                        "format": {'
-    '                            "type": "string",'
-    '                            "enum": ["celsius", "fahrenheit"],'
-    '                            "description": "The temperature unit to use. Infer this from the users location.",'
-    '                        },'
-    '                    },'
-    '                    "required": ["location", "format"],'
-    '                },')
-
-
-    result = execute_prompts(prompt=prompt)
-    print(result)
+    model='mistral'
+    result = execute_prompts(prompt=combined_prompt, model=model)
+    print(result['response'])
     user_tools = []
     return user_tools
     
