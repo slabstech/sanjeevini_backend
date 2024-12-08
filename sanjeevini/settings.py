@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'drf_spectacular',
+    'drf_spectacular_sidecar',
     'drf_yasg',
     'csp',
     'rest_framework',
@@ -182,4 +183,7 @@ SPECTACULAR_SETTINGS = {
     'TERMS_OF_SERVICE': 'https://www.sanjeevini.me/',
     'CONTACT': {'email': 'info@slabstech.com'},
     'LICENSE': {'name': 'MIT License'},
+    "SWAGGER_UI_DIST": "SIDECAR",
+    "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
+    "REDOC_DIST": "SIDECAR",
 }
