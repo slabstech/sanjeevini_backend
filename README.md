@@ -12,11 +12,21 @@ Server for Sanjeevini Health App
 
 - Setup
   - Create virtual environment
-    - python -m venv venv
+    - `python -m venv venv`
   - Activate virtual enviroment
-    - source venv/bin/activate
+    - `source venv/bin/activate`
   - Install required libraries
-    - pip install -r requirements.txt
+    - `pip install -r requirements.txt`
 
+  - For Inference
+    - local
+      - Run ollama 
+    - cloud
+      - Add Mistral API Key
+        - export MISTRAL_API_KEY='Your-Mistral-Api-Key'
+  - Run migrations
+    - `python manage.py migrate`
   - Start server
-    - python manage.py runserver
+    - `python manage.py runserver`
+
+
