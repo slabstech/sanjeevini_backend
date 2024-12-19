@@ -38,10 +38,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'drf_spectacular',
+    'drf_spectacular_sidecar',
     'drf_yasg',
     'csp',
     'rest_framework',
     'rest_framework.authtoken',
+    'inference',
     'userapp',
     'doctorapp',
     'doctorappointmentapp',
@@ -62,6 +65,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'csp.middleware.CSPMiddleware',
+    'sanjeevini.middleware.XFrameOptionsMiddleware',
 ]
 
 ROOT_URLCONF = 'sanjeevini.urls'
@@ -158,6 +162,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
     ],
@@ -168,4 +173,17 @@ REST_FRAMEWORK = {
 # TODO - remove comment after authentication in frontend is enforced
 #        'rest_framework.permissions.IsAuthenticated',
     ]
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Sanjeevini',
+    'DESCRIPTION': 'AI Health App',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'TERMS_OF_SERVICE': 'https://www.sanjeevini.me/',
+    'CONTACT': {'email': 'info@slabstech.com'},
+    'LICENSE': {'name': 'MIT License'},
+    "SWAGGER_UI_DIST": "SIDECAR",
+    "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
+    "REDOC_DIST": "SIDECAR",
 }
