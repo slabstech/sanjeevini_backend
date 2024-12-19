@@ -45,15 +45,15 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'inference',
-    'userapp',
-    'doctorapp',
-    'doctorappointmentapp',
-    'prescriptionapp',
-    'userappointmentapp',
-    'userdiabetesapp',
-    'userheartapp',
-    'usermaternityapp',
-    'userweightapp',
+    
+    'user.userapp',
+    'doctor.doctorapp',
+    'doctor.doctorappointmentapp',
+    'user.prescriptionapp',
+    'user.userappointmentapp',
+    'user.userdiabetesapp',
+    'user.userheartapp',
+    'user.userweightapp',
 ]
 
 MIDDLEWARE = [
