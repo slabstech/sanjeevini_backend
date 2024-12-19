@@ -9,5 +9,14 @@ Server for Sanjeevini Health App
 </a>
 
 
-- python manage.py spectacular --file schema.yml
-- python manage.py spectacular --file openapi.json
+
+- Setup
+  - Create virtual environment
+    - python -m venv venv
+  - Activate virtual enviroment
+    - source venv/bin/activate
+  - Install required libraries
+    - pip install -r requirements.txt
+
+  - Start server
+    - python manage.py runserver
